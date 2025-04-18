@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Savings-to-Freedom Tracker</title>
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary-color: #10b981;
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-color: #1f2937;
+      --text-light: #6b7280;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --border-radius: 12px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-top: 30px;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    
+    .card {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+    
+    .input-section {
+      margin-bottom: 30px;
+    }
+    
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--primary-light);
+    }
+    
+    .input-prefix {
+      position: relative;
+    }
+    
+    .input-prefix input {
+      padding-left: 30px;
+    }
+    
+    .input-prefix::before {
+      content: "$";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+    }
+    
+    .button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    
+    .button:hover {
+      background-color: var(--primary-light);
+    }
+    
+    .button:active {
+      transform: translateY(1px);
+    }
+    
+    .results-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .result-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 20px;
+      border-radius: var(--border-radius);
+      background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+      color: white;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .result-value {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    
+    .result-label {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    .chart-container {
+      width: 100%;
+      height: 350px;
+      margin-top: 30px;
+      position: relative;
+    }
+    
+    .details-section {
+      margin-top: 20px;
+    }
+    
+    .details-title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    
+    .detail-item {
+      padding: 16px;
+      background-color: #f8fafc;
+      border-radius: 10px;
+      border-left: 4px solid var(--secondary-color);
+    }
+    
+    .detail-label {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 5px;
+    }
+    
+    .detail-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .assumptions {
+      margin-top: 40px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    
+    .assumptions-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .assumptions ul {
+      list-style-position: inside;
+    }
+    
+    .assumptions li {
+      margin-bottom: 5px;
+    }
+    
+    #results {
+      display: none;
+    }
+    
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .toggle-label {
+      margin-right: 10px;
+      font-weight: 500;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 30px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: var(--secondary-color);
+    }
+    
+    input:focus + .slider {
+      box-shadow: 0 0 1px var(--secondary-color);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+    
+    .error-message {
+      color: #ef4444;
+      margin-top: 5px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      padding: 20px 0;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Savings-to-Freedom Tracker</h1>
+      <p class="subtitle">Calculate how long your savings will last based on your monthly expenses</p>
+    </header>
+    
+    <div class="app-container">
+      <div class="card">
+        <div class="input-section">
+          <div class="input-grid">
+            <div class="input-group">
+              <label for="current-savings">Current Savings</label>
+              <div class="input-prefix">
+                <input type="number" id="current-savings" min="0" step="100" placeholder="Enter your total savings">
+              </div>
+              <div class="error-message" id="savings-error">Please enter a valid savings amount</div>
+            </div>
+            
+            <div class="input-group">
+              <label for="monthly-expenses">Monthly Expenses</label>
+              <div class="input-prefix">
+                <input type="number" id="monthly-expenses" min="0" step="10" placeholder="Enter your monthly expenses">
+              </div>
+              <div class="error-message" id="expenses-error">Please enter a valid expense amount</div>
+            </div>
+          </div>
+          
+          <div class="toggle-container">
+            <span class="toggle-label">Include investment growth</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="investment-growth-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div class="input-group" id="annual-return-container" style="display: none;">
+            <label for="annual-return">Expected Annual Return (%)</label>
+            <input type="number" id="annual-return" min="0" max="20" step="0.1" value="5" placeholder="Expected annual return on investments">
+          </div>
+          
+          <button id="calculate-btn" class="button">Calculate Freedom Timeline</button>
+        </div>
+      </div>
+      
+      <div id="results" class="card">
+        <div class="results-section">
+          <div class="result-card">
+            <div class="result-value" id="months-result">24</div>
+            <div class="result-label">months of freedom</div>
+          </div>
+          
+          <div class="result-card">
+            <div class="result-value" id="years-result">2</div>
+            <div class="result-label">years of freedom</div>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="freedom-chart"></canvas>
+          </div>
+        </div>
+        
+        <div class="details-section">
+          <h3 class="details-title">Detailed Breakdown</h3>
+          
+          <div class="details-grid">
+            <div class="detail-item">
+              <div class="detail-label">Current Savings</div>
+              <div class="detail-value" id="detail-savings">$25,000</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Monthly Expenses</div>
+              <div class="detail-value" id="detail-expenses">$1,000</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Monthly Burn Rate</div>
+              <div class="detail-value" id="detail-burn-rate">$1,000</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Freedom Date</div>
+              <div class="detail-value" id="detail-freedom-date">May 17, 2027</div>
+            </div>
+          </div>
+          
+          <div class="assumptions">
+            <div class="assumptions-title">Assumptions</div>
+            <ul>
+              <li>Calculations assume consistent monthly expenses over time</li>
+              <li>No additional income is considered during this period</li>
+              <li id="investment-assumption">No investment growth is included in these calculations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <p>Savings-to-Freedom Tracker helps you visualize your financial runway. Make informed decisions about your savings and expenses.</p>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const currentSavingsInput = document.getElementById('current-savings');
+      const monthlyExpensesInput = document.getElementById('monthly-expenses');
+      const calculateBtn = document.getElementById('calculate-btn');
+      const resultsSection = document.getElementById('results');
+      const monthsResult = document.getElementById('months-result');
+      const yearsResult = document.getElementById('years-result');
+      const detailSavings = document.getElementById('detail-savings');
+      const detailExpenses = document.getElementById('detail-expenses');
+      const detailBurnRate = document.getElementById('detail-burn-rate');
+      const detailFreedomDate = document.getElementById('detail-freedom-date');
+      const investmentGrowthToggle = document.getElementById('investment-growth-toggle');
+      const annualReturnContainer = document.getElementById('annual-return-container');
+      const annualReturnInput = document.getElementById('annual-return');
+      const investmentAssumption = document.getElementById('investment-assumption');
+      const savingsError = document.getElementById('savings-error');
+      const expensesError = document.getElementById('expenses-error');
+      
+      // Chart variables
+      let freedomChart = null;
+      
+      // Event listeners
+      calculateBtn.addEventListener('click', calculateFreedom);
+      investmentGrowthToggle.addEventListener('change', toggleInvestmentOptions);
+      
+      // Functions
+      function toggleInvestmentOptions() {
+        annualReturnContainer.style.display = investmentGrowthToggle.checked ? 'block' : 'none';
+      }
+      
+      function validateInputs() {
+        let isValid = true;
+        
+        // Validate savings
+        if (!currentSavingsInput.value || isNaN(currentSavingsInput.value) || Number(currentSavingsInput.value) < 0) {
+          savingsError.style.display = 'block';
+          isValid = false;
+        } else {
+          savingsError.style.display = 'none';
+        }
+        
+        // Validate expenses
+        if (!monthlyExpensesInput.value || isNaN(monthlyExpensesInput.value) || Number(monthlyExpensesInput.value) <= 0) {
+          expensesError.style.display = 'block';
+          isValid = false;
+        } else {
+          expensesError.style.display = 'none';
+        }
+        
+        return isValid;
+      }
+      
+      function formatCurrency(value) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(value);
+      }
+      
+      function getFreedomDate(months) {
+        const today = new Date();
+        const freedomDate = new Date(today);
+        freedomDate.setMonth(today.getMonth() + months);
+        
+        return freedomDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+      
+      function calculateFreedom() {
+        if (!validateInputs()) {
+          return;
+        }
+        
+        const currentSavings = Number(currentSavingsInput.value);
+        const monthlyExpenses = Number(monthlyExpensesInput.value);
+        const includeInvestment = investmentGrowthToggle.checked;
+        const annualReturn = includeInvestment ? Number(annualReturnInput.value) / 100 : 0;
+        const monthlyReturn = includeInvestment ? Math.pow(1 + annualReturn, 1/12) - 1 : 0;
+        
+        // Calculate freedom timeline
+        const freedomData = calculateFreedomTimeline(currentSavings, monthlyExpenses, monthlyReturn);
+        const months = freedomData.months;
+        const years = Math.floor(months / 12);
+        const remainingMonths = months % 12;
+        
+        // Update results
+        monthsResult.textContent = months;
+        yearsResult.textContent = years + (remainingMonths > 0 ? "." + Math.round(remainingMonths / 12 * 10) : "");
+        
+        // Update details
+        detailSavings.textContent = formatCurrency(currentSavings);
+        detailExpenses.textContent = formatCurrency(monthlyExpenses);
+        detailBurnRate.textContent = formatCurrency(monthlyExpenses);
+        detailFreedomDate.textContent = getFreedomDate(months);
+        
+        // Update investment assumption text
+        if (includeInvestment) {
+          investmentAssumption.textContent = `Calculations include ${annualReturnInput.value}% annual investment growth`;
+        } else {
+          investmentAssumption.textContent = 'No investment growth is included in these calculations';
+        }
+        
+        // Update chart
+        updateChart(freedomData.balanceOverTime);
+        
+        // Show results section
+        resultsSection.style.display = 'block';
+        
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      function calculateFreedomTimeline(initialBalance, monthlyExpense, monthlyReturn) {
+        let balance = initialBalance;
+        let months = 0;
+        const balanceOverTime = [balance];
+        
+        while (balance > 0 && months < 600) { // Cap at 50 years (600 months)
+          // Apply investment return first
+          balance = balance * (1 + monthlyReturn);
+          
+          // Subtract monthly expenses
+          balance -= monthlyExpense;
+          
+          // Increment month counter
+          months++;
+          
+          // Store balance for chart (only store every 3 months after 24 months for performance)
+          if (months <= 24 || months % 3 === 0) {
+            balanceOverTime.push(Math.max(0, balance));
+          }
+        }
+        
+        return {
+          months: months,
+          balanceOverTime: balanceOverTime
+        };
+      }
+      
+      function updateChart(balanceData) {
+        const ctx = document.getElementById('freedom-chart').getContext('2d');
+        
+        // Destroy existing chart if it exists
+        if (freedomChart) {
+          freedomChart.destroy();
+        }
+        
+        // Generate labels (months)
+        const labels = [];
+        for (let i = 0; i < balanceData.length; i++) {
+          if (i === 0) {
+            labels.push('Now');
+          } else if (i <= 24 || i % 3 === 0) {
+            labels.push(`Month ${i}`);
+          }
+        }
+        
+        // Create chart
+        freedomChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Savings Balance',
+              data: balanceData,
+              backgroundColor: 'rgba(79, 70, 229, 0.2)',
+              borderColor: 'rgba(79, 70, 229, 1)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true,
+              pointRadius: 3,
+              pointBackgroundColor: 'rgba(79, 70, 229, 1)'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return formatCurrency(context.raw);
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return formatCurrency(value);
+                  }
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                }
+              }
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
