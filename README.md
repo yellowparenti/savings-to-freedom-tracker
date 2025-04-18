@@ -2,7 +2,9 @@
 
 A responsive web application that helps users visualize how long their savings will last based on monthly expenses.
 
-![Savings-to-Freedom Tracker Screenshot](/api/placeholder/800/450)
+![Savings-to-Freedom Tracker Screenshot](images/savings-tracker.png)
+
+View here: [Savings-to-Freedom Tracker](https://yellowparenti.github.io/savings-to-freedom-tracker/)
 
 ## Overview
 
